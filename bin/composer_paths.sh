@@ -3,13 +3,18 @@
 composer_path="${1:-$(which composer)}"
 working_directory="${2:-.}"
 php_path="${3:-$(which php)}"
+custom_composer_filename="${4:-}"
 
 function test_composer {
     "${php_path}" "${composer_path}" --version > /dev/null 2>&1
 }
 
 function validate_composer {
-    "${php_path}" "${composer_path}" validate --no-check-publish --no-check-lock --working-dir "${working_directory}" > /dev/null 2>&1
+    if [ -n "${custom_composer_filename}" ]; then
+        export COMPOSER="${custom_composer_filename}.json"
+    fi
+
+    "${php_path}" "${composer_path}" validate --no-check-publish --no-check-lock --working-dir "${working_directory}"  > /dev/null 2>&1
 }
 
 if ! test_composer; then
@@ -20,14 +25,19 @@ fi
 composer_json="composer.json"
 composer_lock="composer.lock"
 
+if [ -n "${custom_composer_filename}" ]; then
+    composer_json="${custom_composer_filename}.json"
+    composer_lock="${custom_composer_filename}.lock"
+fi
+
 if [ -n "${working_directory}" ]; then
     if [ ! -d "${working_directory}" ]; then
         echo "::error title=Working Directory Not Found::Unable to find working directory at '${working_directory}'"
         exit 1
     fi
 
-    composer_json="${working_directory}/composer.json"
-    composer_lock="${working_directory}/composer.lock"
+    composer_json="${working_directory}/${composer_json}"
+    composer_lock="${working_directory}/${composer_lock}"
 fi
 
 if [ ! -f "${composer_json}" ]; then
