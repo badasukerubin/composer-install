@@ -85,6 +85,19 @@ For example:
     composer-options: "--ignore-platform-reqs --optimize-autoloader"
 ```
 
+#### custom-composer-filename
+
+If you have a custom `composer` filename, you may use the `custom-composer-filename`. For example, your `composer` file could be `composer-gh-actions.json` or `composer-staging.json` instead of the default `composer.json`.
+You should specify the filename without the extension.
+
+For example:
+
+```yaml
+- uses: "ramsey/composer-install@v3"
+  with:
+    custom-composer-filename: "composer-gh-actions"
+```
+
 #### working-directory
 
 The `working-directory` input parameter allows you to specify a different
